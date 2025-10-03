@@ -1,102 +1,80 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>   
+#define MAX_LEN 100   
 
-#define MAX_LEN 100   // buffer length
-
-
-void removeSpaces(char* str) {
-    char* i = str;  // read pointer
-    char* j = str;  // write pointer
-
-    while (*i) {
-        if (*i != ' ' && *i != '\n') {  // ignore spaces and newline
-            *j++ = *i;
-        }
-        i++;
-    }
-    *j = '\0';  
-}
-
-// --- Evaluate expression with DMAS order ---
-int evaluateExpression(char* expr, int* error) {
-    int nums[100];   // numbers
-    char ops[100];   // + or -
+int solve(char* expr, int* error) {
+    int numstack[100];  
+    char opstack[100]; 
+    int result=0; 
     int nTop = -1, oTop = -1;
 
-    // first number must be valid
     if (!isdigit((unsigned char)*expr)) {
-        *error = 2;  // invalid expression
-        return 0;
-    }
-    nums[++nTop] = strtol(expr, &expr, 10);
+        *error = 2;}
+    numstack[++nTop] = strtol(expr, &expr, 10);
 
-    // loop through operators and numbers
     while (*expr) {
-        char op = *expr++;  // operator
-
-        // operator must be valid
+        char op = *expr++; 
         if (!(op == '+' || op == '-' || op == '*' || op == '/')) {
-            *error = 2;
-            return 0;
-        }
-
-        // next number must exist
+            *error = 2; }
         if (!isdigit((unsigned char)*expr)) {
-            *error = 2;
-            return 0;
-        }
-
+            *error = 2; }
         int num = strtol(expr, &expr, 10);
-
         if (op == '*') {
-            nums[nTop] *= num;
+            numstack[nTop] *= num;
         } else if (op == '/') {
             if (num == 0) { 
-                *error = 1;  // division by zero
-                return 0;
-            }
-            nums[nTop] /= num;
+                *error = 1;
+                return 0; }
+            numstack[nTop] /= num;
         } else {
-            ops[++oTop] = op;
-            nums[++nTop] = num;
+            opstack[++oTop] = op;
+            numstack[++nTop] = num;
         }
     }
-
-    int result = nums[0];
+    result = numstack[0];
     int idx = 1;
     for (int j = 0; j <= oTop; j++) {
-        if (ops[j] == '+')
-            result += nums[idx++];
+        if (opstack[j] == '+')
+            result += numstack[idx++];
         else
-            result -= nums[idx++];
-    }
+            result -= numstack[idx++];}
+    return result;}
 
-    return result;
-}
+void removeSpaces(char* str) {
+    char* readptr = str;  
+    char* writeptr = str;  
+    while (*readptr) {
+        if (*readptr!= ' ' && *readptr != '\n') {  
+            *writeptr++ = *readptr;}
+        readptr++;}
+    *writeptr = '\0';}
+
+int readexpression(char* expr) {
+    int read_status = 0; 
+    printf("Enter expression: ");
+    if (fgets(expr, MAX_LEN, stdin) != NULL)  {
+        read_status = 1; 
+    } else {
+    printf("Error reading input.\n");}
+    return read_status; }
 
 int main(void) {
     char expr[MAX_LEN];
-
-    printf("Enter expression: ");
-    if (fgets(expr, sizeof(expr), stdin) == NULL) {
-        printf("Error reading input.\n");
-        return 1;
-    }
-
-    removeSpaces(expr);  
-
-    int error = 0;
-    int result = evaluateExpression(expr, &error);
-
-    if (error == 1) {
-        printf("Error: Division by zero!\n");
-    } else if (error == 2) {   
-        printf("Error: Invalid expression!\n");
+    int error = 0; 
+    int result = 0; 
+    int read_status = readexpression(expr);
+    if(read_status){
+    removeSpaces(expr);
+    result = solve(expr, &error);
     } else {
-        printf("Result = %d\n", result);
-    }
-
+        error = 2;}
+        
+    if (error == 1) {
+    printf("Error: Division by zero.\n");
+    } else if (error == 2) { 
+    printf("Error: Invalid expression.\n");
+    } else {
+    printf("Result = %d\n", result);}
     return 0;
 }
-
