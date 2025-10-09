@@ -1,5 +1,11 @@
-.vscode
+# Executables
 *.exe
-*.log
-user.txt
+*.o
+*.out
 
+# Common temporary files
+*.tmp
+*.log
+
+# Specific files you want to stop tracking
+users.txt
