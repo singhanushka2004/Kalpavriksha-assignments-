@@ -1,146 +1,134 @@
 #include <stdio.h>
 
 #define MAX_STUDENTS 100
-#define MAX_NAME_LENGTH 50
 
 struct Student
 {
     int rollNo;
-    char name[MAX_NAME_LENGTH];
-    int marks1;
-    int marks2;
-    int marks3;
+    char name[50];
+    int marks[3];
     int totalMarks;
     float averageMarks;
     char grade;
 };
 
-void input_student_data(struct Student *s)
+void inputStudentData(struct Student *student)
 {
-    printf("Enter Roll No, Name, Marks1, Marks2, Marks3 : \n");
-    scanf("%d %s %d %d %d",
-          &s->rollNo,
-          s->name,
-          &s->marks1,
-          &s->marks2,
-          &s->marks3);
+    printf("Enter Roll No, Name, Marks1, Marks2, Marks3:\n");
+    scanf(" %d %s %d %d %d",
+          &student->rollNo,
+          student->name,
+          &student->marks[0],
+          &student->marks[1],
+          &student->marks[2]);
 }
 
-int calculateTotal(int marks1, int marks2, int marks3)
+void computeGrade(struct Student *student)
 {
-    int total = marks1 + marks2 + marks3;
-    return total;
-}
-
-float calculateAverage(float total)
-{
-    return total / 3.0;
-}
-
-char calculateGrade(float average)
-{
-    if (average >= 85)
+    if (student->averageMarks >= 85)
     {
-        return 'A';
+        student->grade = 'A';
     }
-    else if (average >= 70)
+    else if (student->averageMarks >= 70)
     {
-        return 'B';
+        student->grade = 'B';
     }
-    else if (average >= 50)
+    else if (student->averageMarks >= 50)
     {
-        return 'C';
+        student->grade = 'C';
     }
-    else if (average >= 35)
+    else if (student->averageMarks >= 35)
     {
-        return 'D';
+        student->grade = 'D';
     }
     else
     {
-        return 'F';
+        student->grade = 'F';
     }
 }
 
-void PerformancePattern(int stars)
+void computePerformance(char grade)
 {
-    for (int i = 0; i < stars; i++)
+    int countOfStars = 0;
+
+    switch (grade)
+    {
+    case 'A':
+        countOfStars = 5;
+        break;
+    case 'B':
+        countOfStars = 4;
+        break;
+    case 'C':
+        countOfStars = 3;
+        break;
+    case 'D':
+        countOfStars = 2;
+        break;
+    default:
+        break;
+    }
+
+    printf("Performance: ");
+    for (int starIndex = 0; starIndex < countOfStars; starIndex++)
     {
         printf("*");
     }
     printf("\n");
 }
 
-void PrintStudentReport(const struct Student *s)
+void printStudentReport(const struct Student *student)
 {
     printf("\n");
-    printf("Roll: %d\n", s->rollNo);
-    printf("Name: %s\n", s->name);
-    printf("Total: %d\n", s->totalMarks);
-    printf("Average: %.2f\n", s->averageMarks);
-    printf("Grade: %c\n", s->grade);
+    printf("Roll: %d\n", student->rollNo);
+    printf("Name: %s\n", student->name);
+    printf("Total: %d\n", student->totalMarks);
+    printf("Average: %f\n", student->averageMarks);
+    printf("Grade: %c\n", student->grade);
 
-    if (s->grade != 'F')
-    {
-        int stars = 0;
-        switch (s->grade)
-        {
-        case 'A':
-            stars = 5;
-            break;
-        case 'B':
-            stars = 4;
-            break;
-        case 'C':
-            stars = 3;
-            break;
-        case 'D':
-            stars = 2;
-            break;
-        default:
-            break;
-        }
-
-        printf("Performance: ");
-        PerformancePattern(stars);
-    }
+    computePerformance(student->grade);
 }
 
-void PrintRollNoRecursively(const struct Student *students, int index, int count)
+void PrintRollNoRecursively(const struct Student *student, int index, int studentCount)
 {
-    if (index == count)
+    if (index == studentCount)
     {
         return;
     }
 
-    printf("%d ", students[index].rollNo);
-    PrintRollNoRecursively(students, index + 1, count);
+    printf("%d ", student[index].rollNo);
+    PrintRollNoRecursively(student, index + 1, studentCount);
 }
 
-int main(void)
+int main()
 {
-    int n;
+    int noOfStudents = 0;
+
+    struct Student students[MAX_STUDENTS];
+
     printf("Enter the number of students: ");
-    scanf("%d", &n);
+    scanf("%d", &noOfStudents);
 
-    struct Student students[n];
-    for (int i = 0; i < n; ++i)
+    for (int index = 0; index < noOfStudents; ++index)
     {
-        printf("\n Student %d ", i + 1);
-        input_student_data(&students[i]);
+        printf("\n Student %d ", index + 1);
 
-        students[i].totalMarks = calculateTotal(students[i].marks1, students[i].marks2, students[i].marks3);
-        students[i].averageMarks = calculateAverage(students[i].totalMarks);
-        students[i].grade = calculateGrade(students[i].averageMarks);
+        inputStudentData(&students[index]);
+
+        students[index].totalMarks = students[index].marks[0] + students[index].marks[1] + students[index].marks[2];
+        students[index].averageMarks = students[index].totalMarks / 3.0;
+
+        computeGrade(&students[index]);
     }
 
-    printf("\n-- Student Report --");
-    for (int i = 0; i < n; ++i)
+    printf("\n-Student Report-");
+    for (int index = 0; index < noOfStudents; ++index)
     {
-        PrintStudentReport(&students[i]);
+        printStudentReport(&students[index]);
     }
 
-    printf("\nList of Roll Numbers : ");
-    PrintRollNoRecursively(students, 0, n);
+    printf("\nList of Student Roll Numbers : ");
+    PrintRollNoRecursively(students, 0, noOfStudents);
     printf("\n");
 
     return 0;
