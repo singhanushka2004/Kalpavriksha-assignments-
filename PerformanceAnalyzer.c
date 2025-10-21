@@ -2,7 +2,7 @@
 
 #define MAX_STUDENTS 100
 
-struct Student
+typedef struct Student
 {
     int rollNo;
     char name[50];
@@ -12,7 +12,7 @@ struct Student
     char grade;
 };
 
-void inputStudentData(struct Student *student)
+void inputStudentData(Student *student)
 {
     printf("Enter Roll No, Name, Marks1, Marks2, Marks3:\n");
     scanf(" %d %s %d %d %d",
@@ -23,7 +23,7 @@ void inputStudentData(struct Student *student)
           &student->marks[2]);
 }
 
-void computeGrade(struct Student *student)
+void computeGrade(Student *student)
 {
     if (student->averageMarks >= 85)
     {
@@ -77,7 +77,7 @@ void computePerformance(char grade)
     printf("\n");
 }
 
-void printStudentReport(const struct Student *student)
+void printStudentReport(const Student *student)
 {
     printf("\n");
     printf("Roll: %d\n", student->rollNo);
@@ -89,7 +89,7 @@ void printStudentReport(const struct Student *student)
     computePerformance(student->grade);
 }
 
-void PrintRollNoRecursively(const struct Student *student, int index, int studentCount)
+void PrintRollNoRecursively(const Student *student, int index, int studentCount)
 {
     if (index == studentCount)
     {
@@ -102,14 +102,14 @@ void PrintRollNoRecursively(const struct Student *student, int index, int studen
 
 int main()
 {
-    int noOfStudents = 0;
+    int numOfStudents = 0;
 
-    struct Student students[MAX_STUDENTS];
+    Student students[MAX_STUDENTS];
 
     printf("Enter the number of students: ");
-    scanf("%d", &noOfStudents);
+    scanf("%d", &numOfStudents);
 
-    for (int index = 0; index < noOfStudents; ++index)
+    for (int index = 0; index < numOfStudents; ++idex)
     {
         printf("\n Student %d ", index + 1);
 
@@ -122,15 +122,14 @@ int main()
     }
 
     printf("\n-Student Report-");
-    for (int index = 0; index < noOfStudents; ++index)
+    for (int index = 0; index < numOfStudents; ++idex)
     {
         printStudentReport(&students[index]);
     }
 
     printf("\nList of Student Roll Numbers : ");
-    PrintRollNoRecursively(students, 0, noOfStudents);
+    PrintRollNoRecursively(students, 0, numOfStudents);
     printf("\n");
 
     return 0;
 }
-
