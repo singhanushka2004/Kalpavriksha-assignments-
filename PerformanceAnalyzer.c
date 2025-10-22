@@ -2,7 +2,7 @@
 
 #define MAX_STUDENTS 100
 
-typedef struct Student
+typedef struct
 {
     int rollNo;
     char name[50];
@@ -10,7 +10,7 @@ typedef struct Student
     int totalMarks;
     float averageMarks;
     char grade;
-};
+} Student;
 
 void inputStudentData(Student *student)
 {
@@ -26,25 +26,15 @@ void inputStudentData(Student *student)
 void computeGrade(Student *student)
 {
     if (student->averageMarks >= 85)
-    {
         student->grade = 'A';
-    }
     else if (student->averageMarks >= 70)
-    {
         student->grade = 'B';
-    }
     else if (student->averageMarks >= 50)
-    {
         student->grade = 'C';
-    }
     else if (student->averageMarks >= 35)
-    {
         student->grade = 'D';
-    }
     else
-    {
         student->grade = 'F';
-    }
 }
 
 void computePerformance(char grade)
@@ -70,31 +60,25 @@ void computePerformance(char grade)
     }
 
     printf("Performance: ");
-    for (int starIndex = 0; starIndex < countOfStars; starIndex++)
-    {
+    for (int i = 0; i < countOfStars; i++)
         printf("*");
-    }
     printf("\n");
 }
 
 void printStudentReport(const Student *student)
 {
-    printf("\n");
-    printf("Roll: %d\n", student->rollNo);
+    printf("\nRoll: %d\n", student->rollNo);
     printf("Name: %s\n", student->name);
     printf("Total: %d\n", student->totalMarks);
-    printf("Average: %f\n", student->averageMarks);
+    printf("Average: %.2f\n", student->averageMarks);
     printf("Grade: %c\n", student->grade);
-
     computePerformance(student->grade);
 }
 
 void PrintRollNoRecursively(const Student *student, int index, int studentCount)
 {
     if (index == studentCount)
-    {
         return;
-    }
 
     printf("%d ", student[index].rollNo);
     PrintRollNoRecursively(student, index + 1, studentCount);
@@ -103,31 +87,26 @@ void PrintRollNoRecursively(const Student *student, int index, int studentCount)
 int main()
 {
     int numOfStudents = 0;
-
     Student students[MAX_STUDENTS];
-
     printf("Enter the number of students: ");
     scanf("%d", &numOfStudents);
-
-    for (int index = 0; index < numOfStudents; ++idex)
+    for (int index = 0; index < numOfStudents; ++index)
     {
-        printf("\n Student %d ", index + 1);
-
+        printf("\nStudent %d\n", index + 1);
         inputStudentData(&students[index]);
 
-        students[index].totalMarks = students[index].marks[0] + students[index].marks[1] + students[index].marks[2];
+        students[index].totalMarks = students[index].marks[0] +
+                                     students[index].marks[1] +
+                                     students[index].marks[2];
         students[index].averageMarks = students[index].totalMarks / 3.0;
-
         computeGrade(&students[index]);
     }
 
-    printf("\n-Student Report-");
-    for (int index = 0; index < numOfStudents; ++idex)
-    {
+    printf("\n- Student Report -\n");
+    for (int index = 0; index < numOfStudents; ++index)
         printStudentReport(&students[index]);
-    }
 
-    printf("\nList of Student Roll Numbers : ");
+    printf("\nList of Student Roll Numbers: ");
     PrintRollNoRecursively(students, 0, numOfStudents);
     printf("\n");
 
