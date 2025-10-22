@@ -94,7 +94,6 @@ int main()
     {
         printf("\nStudent %d\n", index + 1);
         inputStudentData(&students[index]);
-
         students[index].totalMarks = students[index].marks[0] +
                                      students[index].marks[1] +
                                      students[index].marks[2];
@@ -105,7 +104,6 @@ int main()
     printf("\n- Student Report -\n");
     for (int index = 0; index < numOfStudents; ++index)
         printStudentReport(&students[index]);
-
     printf("\nList of Student Roll Numbers: ");
     PrintRollNoRecursively(students, 0, numOfStudents);
     printf("\n");
