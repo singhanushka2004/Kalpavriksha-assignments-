@@ -23,7 +23,7 @@ void inputStudentData(Student *student)
           &student->marks[2]);
 }
 
-void computeGrade(const Student *student)
+void computeGrade(Student *student)
 {
     if (student->averageMarks >= 85)
     {
@@ -107,12 +107,14 @@ int main()
                                      students[index].marks[1] +
                                      students[index].marks[2];
         students[index].averageMarks = students[index].totalMarks / 3.0;
-        computeGrade(&students[index]);
     }
-
+    
     printf("\n- Student Report -\n");
     for (int index = 0; index < numOfStudents; ++index)
+    {
+        computeGrade(&students[index]); 
         printStudentReport(&students[index]);
+    }
     printf("\nList of Student Roll Numbers: ");
     PrintRollNoRecursively(students, 0, numOfStudents);
     printf("\n");
