@@ -23,24 +23,33 @@ void inputStudentData(Student *student)
           &student->marks[2]);
 }
 
-void computeGrade(Student *student)
+void computeGrade(const Student *student)
 {
     if (student->averageMarks >= 85)
+    {
         student->grade = 'A';
+    }
     else if (student->averageMarks >= 70)
+    {
         student->grade = 'B';
+    }
     else if (student->averageMarks >= 50)
+    {
         student->grade = 'C';
+    }
     else if (student->averageMarks >= 35)
+    {
         student->grade = 'D';
+    }
     else
+    {
         student->grade = 'F';
+    }
 }
 
 void computePerformance(char grade)
 {
     int countOfStars = 0;
-
     switch (grade)
     {
     case 'A':
@@ -77,9 +86,9 @@ void printStudentReport(const Student *student)
 
 void PrintRollNoRecursively(const Student *student, int index, int studentCount)
 {
-    if (index == studentCount)
+    if (index == studentCount){
         return;
-
+    }
     printf("%d ", student[index].rollNo);
     PrintRollNoRecursively(student, index + 1, studentCount);
 }
