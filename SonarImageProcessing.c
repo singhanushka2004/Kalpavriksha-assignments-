@@ -9,7 +9,7 @@ void generateMatrix(int size, int matrix[size][size])
     {
         for (int column = 0; column < size; column++)
         {
-            matrix[row][column] = rand() % 256;
+            *(*(matrix + row) + column) = rand() % 256;
         }
     }
 }
@@ -20,7 +20,7 @@ void displayMatrix(int size, int matrix[size][size])
     {
         for (int column = 0; column < size; column++)
         {
-            printf("%4d", matrix[row][column]);
+            printf("%4d", *(*(matrix + row) + column)); 
         }
         printf("\n");
     }
@@ -52,7 +52,6 @@ void transposeMatrix(int size, int matrix[size][size])
         {
             int *firstValue = *(matrix + row) + column;
             int *secondValue = *(matrix + column) + row;
-
             int temp = *firstValue;
             *firstValue = *secondValue;
             *secondValue = temp;
@@ -63,7 +62,7 @@ void transposeMatrix(int size, int matrix[size][size])
 
 void applyFilter(int size, int matrix[size][size])
 {
-    int tempMatrix[size][size];
+    int tempRow[size];
     for (int row = 0; row < size; row++)
     {
         for (int column = 0; column < size; column++)
@@ -76,7 +75,6 @@ void applyFilter(int size, int matrix[size][size])
                 {
                     int neighborRow = row + windowRow;
                     int neighborCol = column + windowCol;
-
                     if (neighborRow >= 0 && neighborRow < size &&
                         neighborCol >= 0 && neighborCol < size)
                     {
@@ -85,16 +83,12 @@ void applyFilter(int size, int matrix[size][size])
                     }
                 }
             }
-
-            *(*(tempMatrix + row) + column) = sum / count;
+            *(tempRow + column) = sum / count;
         }
-    }
 
-    for (int row = 0; row < size; row++)
-    {
         for (int column = 0; column < size; column++)
         {
-            *(*(matrix + row) + column) = *(*(tempMatrix + row) + column);
+            *(*(matrix + row) + column) = *(tempRow + column);
         }
     }
 }
@@ -104,27 +98,24 @@ int main()
     int sizeOfMatrix = 0;
     printf("Enter matrix size (2-10): ");
     scanf("%d", &sizeOfMatrix);
-
     if (sizeOfMatrix < 2 || sizeOfMatrix > 10)
     {
         printf("Invalid size of matrix.\n");
         return 1;
     }
-
     int matrix[sizeOfMatrix][sizeOfMatrix];
     printf("\nOriginal Randomly Generated Matrix:\n");
     generateMatrix(sizeOfMatrix, matrix);
     displayMatrix(sizeOfMatrix, matrix);
 
-    printf("\nMatrix after 90 Clockwise Rotation:\n");
+    printf("\nMatrix after 90 degree Clockwise Rotation:\n");
+    transposeMatrix(sizeOfMatrix, matrix);
     displayMatrix(sizeOfMatrix, matrix);
-    applyFilter(sizeOfMatrix, matrix);
 
+    applyFilter(sizeOfMatrix, matrix);
     printf("\nMatrix after Applying 3*3 Smoothing Filter:\n");
     displayMatrix(sizeOfMatrix, matrix);
 
     return 0;
 }
-
-
 
