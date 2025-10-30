@@ -26,16 +26,16 @@ typedef enum MenuOptions
 Product *inventory = NULL;
 int productCount = 0;
 
-void inputProductDetails(Product *ptr)
+void inputProductDetails(Product *product)
 {
     printf("ID: ");
-    scanf("%d", &ptr->id);
+    scanf("%d", &product->id);
     printf("Name: ");
-    scanf("%s", ptr->name);
+    scanf("%s", product->name);
     printf("Price: ");
-    scanf("%f", &ptr->price);
+    scanf("%f", &product->price);
     printf("Quantity: ");
-    scanf("%d", &ptr->quantity);
+    scanf("%d", &product->quantity);
 }
 
 void addProduct()
@@ -86,7 +86,7 @@ void updateQuantity()
         {
             printf("Enter new Quantity: ");
             scanf("%d", &newQuantity);
-            inventory[item].quantity =newQuantity;
+            inventory[item].quantity = newQuantity;
             found = true;
             printf("Quantity updated successfully!\n");
             break;
@@ -239,11 +239,9 @@ void displayMenu()
 
 int main()
 {
-    int initialCount;
     int choice;
     printf("Enter initial number of products: ");
-    scanf("%d", &initialCount);
-    productCount = initialCount;
+    scanf("%d", &productCount);
     inventory = (Product *)calloc(productCount, sizeof(Product));
 
     for (int item = 0; item < productCount; item++)
