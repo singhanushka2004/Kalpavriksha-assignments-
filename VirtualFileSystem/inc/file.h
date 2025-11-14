@@ -1,5 +1,5 @@
-#ifndef VFS_H
-#define VFS_H
+#ifndef VFS_FILE_H
+#define VFS_FILE_H
 
 #include <stddef.h>
 
@@ -27,19 +27,13 @@ typedef struct FileNode {
 void vfsInitialize(int numBlocks);
 void vfsShutdown(void);
 
-void cmdMkdir(const char* dirname);
 void cmdCreate(const char* filename);
-void cmdCd(const char* dirname);
-void cmdLs(void);
-void cmdPwd(void);
-void cmdDf(void);
-void cmdRmdir(const char* dirname);
 void cmdDelete(const char* filename);
 void cmdRead(const char* filename);
 void cmdWrite(const char* filename, const char* content);
+void cmdDf(void); 
 
-FileNode* vfsGetCwd(void);
+FileNode* findChildByName(FileNode* directoryNode, const char* nameToFind);
+FileNode* allocateFileNode(const char* nameText, int isDirectoryFlag);
 
-void runCli(void);
-
-#endif
+#endif 

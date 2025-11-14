@@ -1,6 +1,7 @@
+#include "file.h"          
+#include "commandParser.h" 
 #include <stdio.h>
 #include <stdlib.h>
-#include "vfs.h"
 
 int main(int argc, char* argv[]) {
     int configuredBlocks = 1024;
@@ -10,8 +11,8 @@ int main(int argc, char* argv[]) {
     }
 
     vfsInitialize(configuredBlocks);
-    runCli();                       
-    vfsShutdown();                   
+    runCli();
+    vfsShutdown();
 
     return 0;
 }
