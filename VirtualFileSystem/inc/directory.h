@@ -1,13 +1,47 @@
-#ifndef VFS_DIRECTORY_H
-#define VFS_DIRECTORY_H
+#ifndef DIRECTORY_H
+#define DIRECTORY_H
 
-#include "file.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
-void cmdMkdir(const char *dirname);
-void cmdCd(const char *dirname);
-void cmdLs(void);
-void cmdPwd(void);
-void cmdRmdir(const char *dirname);
-FileNode *vfsGetCwd(void);
+typedef struct FreeBlock
+{
+    int index;
+    struct FreeBlock *next;
+    struct FreeBlock *prev;
+} FreeBlock;
+
+typedef struct FileNode
+{
+    char *name;
+    int isDirectory;
+
+    struct FileNode *parent;
+    struct FileNode *child;
+    struct FileNode *next;
+    struct FileNode *prev;
+
+    int size;
+    int blockCount;
+    int *blockPointers;
+} FileNode;
+
+extern FileNode *root, *cwd;
+
+void initializeDisk();
+void initializeRootDirectory();
+bool initializeFileNode(const char *name, const int isDirectory);
+void freeFileTree(FileNode *node);
+void exitProgram();
+
+void makeDirectory(const char *name);
+void removeDirectory(const char *name);
+void changeDirectory(const char *name);
+void showDirectories();
+void showCurrentPath();
+
+bool doesDirectoryExist(const char *name);
 
 #endif

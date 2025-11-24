@@ -1,25 +1,61 @@
 #include "directory.h"
-#include "file.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "file.h" 
 
-extern FileNode *gRootNode;
-extern FileNode *gCwdNode;
+FileNode *root = NULL;
+FileNode *cwd = NULL;
 
-static void insertChildNode(FileNode *parentDir, FileNode *childNode)
-{
+FileNode *findChildByName(FileNode *directoryNode, const char *nameToFind) {
+    if (directoryNode == NULL || !directoryNode->child) return NULL;
+    
+    FileNode *walker = directoryNode->child;
+    do {
+        if (strcmp(walker->name, nameToFind) == 0)
+            return walker;
+        walker = walker->next;
+    } while (walker != directoryNode->child);
+    return NULL;
+}
+
+bool doesDirectoryExist(const char *name) {
+    return findChildByName(cwd, name) != NULL;
+}
+
+static void printFullPath(FileNode *directory) {
+    const size_t maxDepth = 1024;
+    const char *pathStack[maxDepth];
+    size_t depth = 0;
+    FileNode *walker = directory;
+    
+    while (walker != NULL && walker->parent != NULL) {
+        pathStack[depth++] = walker->name;
+        walker = walker->parent;
+        if (depth >= maxDepth) break;
+    }
+    
+    if (depth == 0) {
+        printf("/\n");
+        return;
+    }
+    
+    putchar('/');
+    for (ssize_t idx = (ssize_t)depth - 1; idx >= 0; --idx) {
+        printf("%s", pathStack[idx]);
+        if (idx > 0) putchar('/');
+    }
+    putchar('\n');
+}
+
+static void insertChildNode(FileNode *parentDir, FileNode *childNode) {
     childNode->parent = parentDir;
     childNode->next = childNode->prev = NULL;
-    if (parentDir->childHead == NULL)
-    {
-        parentDir->childHead = childNode;
+    
+    if (parentDir->child == NULL) {
+        parentDir->child = childNode;
         childNode->next = childNode->prev = childNode;
-    }
-    else
-    {
-        FileNode *head = parentDir->childHead;
+    } else {
+        FileNode *head = parentDir->child;
         FileNode *tail = head->prev;
+        
         tail->next = childNode;
         childNode->prev = tail;
         childNode->next = head;
@@ -27,174 +63,152 @@ static void insertChildNode(FileNode *parentDir, FileNode *childNode)
     }
 }
 
-static void unlinkChildNode(FileNode *parentDir, FileNode *childNode)
-{
-    if (parentDir == NULL || childNode == NULL)
-        return;
-    FileNode *head = parentDir->childHead;
-    if (head == NULL)
-        return;
-    if (head == childNode && childNode->next == childNode)
-    {
-        parentDir->childHead = NULL;
-        childNode->next = childNode->prev = NULL;
-        return;
-    }
-    FileNode *walker = head;
-    int found = 0;
-    do
-    {
-        if (walker == childNode)
-        {
-            found = 1;
-            break;
+static void unlinkChildNode(FileNode *parentDir, FileNode *childNode) {
+    if (parentDir == NULL || childNode == NULL || parentDir->child == NULL) return;
+    
+    if (childNode->next == childNode) {
+        parentDir->child = NULL;
+    } else {
+        childNode->prev->next = childNode->next;
+        childNode->next->prev = childNode->prev;
+        if (parentDir->child == childNode) {
+            parentDir->child = childNode->next;
         }
-        walker = walker->next;
-    } while (walker != head);
-    if (!found)
-        return;
-    childNode->prev->next = childNode->next;
-    childNode->next->prev = childNode->prev;
-    if (parentDir->childHead == childNode)
-        parentDir->childHead = childNode->next;
+    }
     childNode->next = childNode->prev = NULL;
 }
 
-static void printFullPath(FileNode *directory)
-{
-    const size_t maxDepth = 1024;
-    const char *pathStack[maxDepth];
-    size_t depth = 0;
-    FileNode *walker = directory;
-    while (walker != NULL && walker->parent != NULL)
-    {
-        pathStack[depth++] = walker->name;
-        walker = walker->parent;
-        if (depth >= maxDepth)
-            break;
-    }
-    if (depth == 0)
-    {
-        printf("/\n");
-        return;
-    }
-    putchar('/');
-    for (ssize_t idx = (ssize_t)depth - 1; idx >= 0; --idx)
-    {
-        printf("%s", pathStack[idx]);
-        if (idx > 0)
-            putchar('/');
-    }
-    putchar('\n');
+static void destroySingleNode(FileNode *node) {
+    if (node == NULL) return;
+    if (node->blockPointers != NULL) free(node->blockPointers);
+    if (node->name != NULL) free(node->name);
+    free(node);
 }
 
-void cmdMkdir(const char *dirname)
-{
-    if (dirname == NULL || dirname[0] == '\0')
-    {
+bool initializeFileNode(const char *name, const int isDirectory) {
+    if (doesDirectoryExist(name)) return false;
+    
+    FileNode *newDir = (FileNode *)malloc(sizeof(FileNode));
+    if (!newDir) { printf("Memory allocation failed for new node.\n"); return false; }
+    
+    newDir->name = (char *)malloc(strlen(name) + 1);
+    if (!newDir->name) { free(newDir); printf("Memory allocation failed for node name.\n"); return false; }
+    strcpy(newDir->name, name);
+    
+    newDir->isDirectory = isDirectory;
+    newDir->child = NULL;
+    newDir->blockCount = 0;
+    newDir->blockPointers = NULL;
+    newDir->size = 0;
+    
+    insertChildNode(cwd, newDir);
+    
+    return true;
+}
+
+void makeDirectory(const char *name) {
+    if (name == NULL || name[0] == '\0') {
         printf("Invalid directory name.\n");
-        return;
+    } else if (initializeFileNode(name, 1)) {
+        printf("Directory '%s' created successfully\n", name);
     }
-    if (findChildByName(gCwdNode, dirname) != NULL)
-    {
-        printf("Name already exists in current directory.\n");
-        return;
-    }
-    FileNode *newDir = allocateFileNode(dirname, 1);
-    insertChildNode(gCwdNode, newDir);
-    printf("Directory '%s' created successfully.\n", dirname);
 }
 
-void cmdCd(const char *dirname)
-{
-    if (dirname == NULL)
-    {
-        printf("Invalid directory.\n");
-        return;
+void removeDirectory(const char *name) {
+    FileNode *target = findChildByName(cwd, name);
+
+    if (target == NULL || !target->isDirectory) {
+        printf("Directory '%s' not found \n", name);
+    } else if (target->child != NULL) {
+        printf("Directory '%s' is not empty \n", name);
+    } else {
+        unlinkChildNode(cwd, target);
+        destroySingleNode(target);
+        printf("Directory '%s' removed successfully \n", name);
     }
-    if (strcmp(dirname, "..") == 0)
-    {
-        if (gCwdNode->parent != NULL)
-        {
-            gCwdNode = gCwdNode->parent;
-            if (gCwdNode == gRootNode)
-                printf("Moved to /\n");
-            else
-            {
-                printf("Moved to ");
-                printFullPath(gCwdNode);
-            }
-        }
-        else
-        {
+}
+
+void showDirectories() {
+    FileNode *temp = cwd->child;
+    if (!temp) {
+        printf("(empty)\n");
+    } else {
+        FileNode *head = temp;
+        do {
+            printf("%s%s\n", temp->name, temp->isDirectory ? "/" : "");
+            temp = temp->next;
+        } while (temp != head);
+        printf("\n");
+    }
+}
+
+void changeDirectory(const char *name) {
+    if (strcmp(name, "..") == 0) {
+        if (cwd->parent != NULL) {
+            cwd = cwd->parent;
+            printf("Moved to %s\n", (cwd == root) ? "/" : cwd->name);
+        } else {
             printf("Already at root.\n");
         }
-        return;
-    }
-    if (strcmp(dirname, "/") == 0)
-    {
-        gCwdNode = gRootNode;
+    } else if (strcmp(name, "/") == 0) {
+        cwd = root;
         printf("Moved to /\n");
-        return;
+    } else {
+        FileNode *target = findChildByName(cwd, name);
+        if (target != NULL && target->isDirectory) {
+            cwd = target;
+            printf("Moved to /%s\n", cwd->name);
+        } else {
+            printf("Directory '%s' not found \n", name);
+        }
     }
-    FileNode *target = findChildByName(gCwdNode, dirname);
-    if (target == NULL || !target->isDirectory)
-    {
-        printf("Directory not found.\n");
-        return;
-    }
-    gCwdNode = target;
-    printf("Moved to ");
-    printFullPath(gCwdNode);
 }
 
-void cmdLs(void)
-{
-    if (gCwdNode->childHead == NULL)
-    {
-        printf("(empty)\n");
+void showCurrentPath() {
+    if (!cwd) {
+        printf("Error: current working directory is NULL \n");
         return;
     }
-    FileNode *walker = gCwdNode->childHead;
-    do
-    {
-        if (walker->isDirectory)
-            printf("%s/\n", walker->name);
-        else
-            printf("%s\n", walker->name);
-        walker = walker->next;
-    } while (walker != gCwdNode->childHead);
+    printFullPath(cwd);
 }
 
-void cmdPwd(void)
-{
-    printFullPath(gCwdNode);
+void freeFileTree(FileNode *node) {
+    if (node) {
+        if (node->child) {
+            FileNode *child = node->child;
+            FileNode *start = child;
+            do {
+                FileNode *next = child->next;
+                freeFileTree(child);
+                child = next;
+            } while (child != start);
+        }
+        
+        if (node->blockPointers) free(node->blockPointers);
+        if (node->name) free(node->name);
+        free(node);
+    }
 }
 
-void cmdRmdir(const char *dirname)
-{
-    if (dirname == NULL || dirname[0] == '\0')
-    {
-        printf("Invalid directory name.\n");
-        return;
-    }
-    FileNode *target = findChildByName(gCwdNode, dirname);
-    if (target == NULL || !target->isDirectory)
-    {
-        printf("Directory not found.\n");
-        return;
-    }
-    if (target->childHead != NULL)
-    {
-        printf("Directory not empty. Remove files first.\n");
-        return;
-    }
-    unlinkChildNode(gCwdNode, target);
-    destroySingleNode(target);
-    printf("Directory removed successfully.\n");
+void initializeRootDirectory() {
+    root = (FileNode *)malloc(sizeof(FileNode));
+    if (!root) { printf("Memory allocation failed for root directory.\n"); exit(1); }
+    
+    root->name = (char *)malloc(2);
+    strcpy(root->name, "/");
+    
+    root->isDirectory = 1;
+    root->parent = NULL;
+    root->next = root->prev = root;
+    root->child = NULL;
+    root->size = 0;
+    root->blockCount = 0;
+    root->blockPointers = NULL;
+    
+    cwd = root;
+    printf("Root directory created: '/'\n");
 }
 
-FileNode *vfsGetCwd(void)
-{
-    return gCwdNode;
+void exitProgram() {
+    printf("Virtual File System closed. All memory freed.\n");
 }
