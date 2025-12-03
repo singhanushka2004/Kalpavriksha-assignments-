@@ -1,9 +1,6 @@
 #ifndef COMMANDPARSER_H
 #define COMMANDPARSER_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "file.h"
 
 extern char **virtualDisk;
