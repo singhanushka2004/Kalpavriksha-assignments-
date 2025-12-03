@@ -1,15 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <strings.h>
+#include <string.h>   
+#include <strings.h>    
 
 #include "menu.h"
 #include "player.h"
 #include "players_data.h"
 #include "performance.h"
-#include "search.h"
-#include "sort.h"
+#include "sort_search.h"
 #include "team.h"
 
 #define MAX_TEAMS 10
@@ -278,7 +276,6 @@ static void displayTopKPlayers()
 
     Player temp[60];
     int tempCount = 0;
-
     Node *cur = head;
     while (cur != NULL)
     {
@@ -299,13 +296,13 @@ static void displayTopKPlayers()
         return;
     }
     printf("Enter number of players K (Rank Limit): ");
+
     int k;
     if (scanf("%d", &k) != 1)
     {
         printf("Invalid input.\n");
         return;
     }
-
     if (k <= 0)
     {
         printf("K must be a positive number.\n");
@@ -407,7 +404,8 @@ int main()
         {
             printf("Non-numeric input detected. Exiting...\n");
             int inputchar;
-            while ((inputchar = getchar()) != '\n' && inputchar != EOF);
+            while ((inputchar = getchar()) != '\n' && inputchar != EOF)
+                ;
             return 0;
         }
 

@@ -1,7 +1,5 @@
 #include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <strings.h>
+#include <strings.h> 
 
 #include "team.h"
 #include "player.h"

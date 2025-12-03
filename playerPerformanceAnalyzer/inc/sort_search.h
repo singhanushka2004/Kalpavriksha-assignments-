@@ -4,8 +4,8 @@
 #include "player.h"
 #include "team.h"
 
-int searchTeamById(const Team teams[], int teamsCount, int teamId);
 void sortTeamsByStrikeRate(Team teams[], int teamsCount);
 void sortPlayersByPerformance(Player players[], int playersCount);
+int searchTeamById(const Team teams[], int teamsCount, int teamId);
 
 #endif

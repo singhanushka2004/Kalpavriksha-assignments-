@@ -1,5 +1,6 @@
 #include <string.h>
 #include <ctype.h>
+
 #include "performance.h"
 
 static int compareStringsInsensitive(const char *ch1, const char *ch2)
