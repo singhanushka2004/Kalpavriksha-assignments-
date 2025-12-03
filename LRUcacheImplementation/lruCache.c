@@ -3,8 +3,6 @@
 #include <string.h>
 #include "lruCache.h"
 
-#define TABLE_SIZE 10000
-
 LRUNode* toCreateNode(int key, char *value) {
     LRUNode *node = malloc(sizeof(LRUNode));
     node->key = key;
@@ -131,3 +129,4 @@ void intitalizingLRUprogram() {
         printf("%s\n", outputLines[i]);
     }
 }
+

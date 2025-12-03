@@ -1,6 +1,8 @@
 #ifndef LRU_CACHE_H
 #define LRU_CACHE_H
 
+#define TABLE_SIZE 10000
+
 typedef struct LRUNode {
     int key;
     char value[100];
@@ -21,3 +23,4 @@ void putCacheValue(LRUCache *cache, int key, char *value);
 void intitalizingLRUprogram();
 
 #endif
+
